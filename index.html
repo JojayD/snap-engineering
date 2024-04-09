@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>MySnap</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+		
+
+		<script
+			type="text/javascript"
+			src="scripts.js"
+		></script>
+		<meta
+			name="description"
+			content="A Catalog of Shows Set in Los Angeles"
+		/>
+		<link
+			rel="stylesheet"
+			href="style.css"
+		/>
+	</head>
+	<body>
+		<header>
+			<div id="container__header">
+				<div class="wrapper__header">
+					<h1 class="page-title">SnapLenses</h1>
+
+					<div class="container__header--search">
+						<div class="search-bar">
+							<input type="text" placeholder="search by name" id="textbox"/>
+						</div>
+						<h3
+							id="favoriteLenses"
+							onclick="showFavorites()"
+						>
+							My Lenses
+						</h3>
+					</div>
+				</div>
+			</div>
+		</header>
+		<div class="container__drop-down">
+			<div class="container__instruction">
+				<h4 class="favoriteDelete">Click on Lense to add</h4>
+			</div>
+			<div class="dropdown">
+				<div class="button-wrapper">
+					<button
+						onclick="toggleDropDown()"
+						class="dropbtn"
+					>
+						Sort
+					</button>
+				</div>
+				<div
+					id="myDropdown"
+					class="dropdown-content"
+				>
+					<a
+						id="sortButtonCreatorName"
+						onclick="sortDataAndRender('Creator Name')"
+						>Creator Name</a
+					>
+					<a
+						id="sortButtonFilterName"
+						onclick="sortDataAndRender('Name')"
+						>Filter</a
+					>
+					<a
+						id="sortButtonPopularity"
+						onclick="sortDataAndRender('useCounts')"
+						>Popularity</a
+					>
+				</div>
+			</div>
+		</div>
+		<div id="container__cards"></div>
+	</body>
+</html>
