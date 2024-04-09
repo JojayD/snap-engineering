@@ -6,7 +6,11 @@ let data = [];
 let isFavoritedAllowed = false; // State is at My lenses
 const itemsPerPage = 20;
 let currentPage = 1;
-
+function generateSimpleID() {
+	const timestamp = Date.now(); // Get the current time in milliseconds
+	const randomPart = Math.random().toString(36).substring(2, 15); // Generate a random string
+	return `${timestamp}-${randomPart}`;
+}
 function limitItems(array, pageNumber, itemsPerPage) {
 	return array.slice((pageNumber - 1) * itemsPerPage, pageNumber * itemsPerPage);
 }
@@ -42,8 +46,9 @@ function deleteCard(cardId) {
 	let storedFavorites = JSON.parse(
 		localStorage.getItem("favoritedCards") || "[]"
 	);
+	console.log(storedFavorites);
 
-	storedFavorites = storedFavorites.filter((item) => item.cardId != cardId);
+	storedFavorites = storedFavorites.filter((item) => item.id != cardId);
 
 	localStorage.setItem("favoritedCards", JSON.stringify(storedFavorites));
 
@@ -116,10 +121,11 @@ async function showCards() {
 
 			const useCounts = item.useCounts;
 
+			const id = item.id;
 			/**
 					                Sets the attribute
 					            */
-			card.setAttribute("data-card-id", index);
+			card.setAttribute("id", id);
 			card.setAttribute("name", filterName);
 			card.setAttribute("url", item.URL);
 			card.setAttribute("creator-name", creatorName);
@@ -141,7 +147,11 @@ async function showCards() {
 async function fetchAndParseCSV(url) {
 	const response = await fetch(url);
 	const csvData = await response.text();
-	return Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
+	let parsedData = Papa.parse(csvData, {
+		header: true,
+		dynamicTyping: true,
+	}).data;
+	return parsedData.map((item) => ({ ...item, id: generateSimpleID() })); // Assign a unique ID
 }
 
 function showFavorites() {
@@ -162,9 +172,10 @@ function showFavorites() {
 	if (favoritedCards.length > 0) {
 		data = favoritedCards.map((item) => {
 			return {
-				Name: item.cardFilterName,
-				URL: item.cardUrl,
-				"Creator Name": item.cardContentCreatorName,
+				id: item.id,
+				Name: item.Name,
+				URL: item.URL,
+				"Creator Name": item["Creator Name"],
 				useCounts: item.useCounts,
 			};
 		});
@@ -184,7 +195,7 @@ function pushAndSave(item) {
 	console.log("Here is the res: ", res);
 	if (!res) {
 		favoritedCards.push(item);
-		alert(`Added ${item.cardContentCreatorName}`);
+		alert(`Added ${item["Creator Name"]}`);
 		saveArray();
 	} else {
 		alert("Already in your favorites");
@@ -217,7 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	containerForCards.addEventListener("click", (event) => {
 		let clickedCard = event.target.closest(".card-container");
 		if (clickedCard) {
-			const cardId = clickedCard.getAttribute("data-card-id");
+			const cardId = clickedCard.getAttribute("id");
 			const cardContentCreatorName = clickedCard.getAttribute("creator-name");
 			const cardUrl = clickedCard.getAttribute("url");
 			const cardFilterName = clickedCard.getAttribute("name");
@@ -229,10 +240,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 				deleteCard(cardId);
 			} else {
 				pushAndSave({
-					cardId: Number(cardId),
-					cardContentCreatorName: cardContentCreatorName,
-					cardUrl: cardUrl,
-					cardFilterName: cardFilterName,
+					id: cardId,
+					"Creator Name": cardContentCreatorName,
+					URL: cardUrl,
+					Name: cardFilterName,
 					useCounts: Number(useCounts),
 				});
 			}
@@ -298,7 +309,6 @@ function toggleDropDown() {
 	document.getElementById("myDropdown").classList.toggle("show");
 }
 
-// Close the dropdown menu if the user clicks outside of it
 window.onclick = function (event) {
 	if (!event.target.matches(".dropbtn")) {
 		let dropdowns = document.getElementsByClassName("dropdown-content");
