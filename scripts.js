@@ -4,6 +4,12 @@ let favoritedCards = [];
 let originalData = [];
 let data = [];
 let isFavoritedAllowed = false; // State is at My lenses
+const itemsPerPage = 20;
+let currentPage = 1;
+
+function limitItems(array, pageNumber, itemsPerPage) {
+	return array.slice((pageNumber - 1) * itemsPerPage, pageNumber * itemsPerPage);
+}
 
 function shallowEqual(obj1, obj2) {
 	const keys1 = Object.keys(obj1);
@@ -75,8 +81,11 @@ function showAllCards() {
 }
 
 async function showCards() {
+	const limitedData = limitItems(data, currentPage, itemsPerPage);
+	clearCards();
+
 	try {
-		data.forEach((item, index) => {
+		limitedData.forEach((item, index) => {
 			const containerForCards = document.getElementById("container__cards");
 			const cardContentWrapper = document.createElement("div");
 			cardContentWrapper.className = "card__content-wrapper ";
@@ -189,6 +198,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 	console.log(isFavoritedAllowed);
 	console.log(data);
 
+	document.getElementById("nextButton").addEventListener("click", () => {
+		const maxPage = Math.ceil(data.length / itemsPerPage);
+		if (currentPage < maxPage) {
+			currentPage++;
+			showCards();
+		}
+	});
+
+	document.getElementById("prevButton").addEventListener("click", () => {
+		if (currentPage > 1) {
+			currentPage--;
+			showCards();
+		}
+	});
+
 	const containerForCards = document.getElementById("container__cards");
 	containerForCards.addEventListener("click", (event) => {
 		let clickedCard = event.target.closest(".card-container");
@@ -264,7 +288,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 				});
 				data = nameRes;
 				console.log(data);
-				clearCards()
+				clearCards();
 				showCards();
 			}
 		}
