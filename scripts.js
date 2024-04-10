@@ -156,7 +156,7 @@ async function fetchAndParseCSV(url) {
 
 function showFavorites() {
 	clearCards();
-
+	currentPage = 1;
 	// Retrieve favorited cards from localStorage, with a fallback to an empty array
 	const storedFavoritesString = localStorage.getItem("favoritedCards");
 
